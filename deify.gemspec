@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name              = 'deify'
-  s.version           = '0.0.1'
+  s.version           = '0.0.2'
   s.date              = Time.now.strftime('%Y-%m-%d')
   s.summary           = 'Sets up god/resque/redis configuration for any app using resque-based gems at Revolution Prep.'
   s.homepage          = ''

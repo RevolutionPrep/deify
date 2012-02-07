@@ -1,65 +1,27 @@
-Surety
+Deify
 ============
 
-A lightweight guaranteed-delivery messaging system.
+A gem that provides a generator to set up god/resque/redis configuration for any Rails app using resque-based gems at Revolution Prep.
 
-
-Dependency Notes
-================
-
-* Surety uses ActiveRecord to persist the message requests in order to provide transactional, guaranteed-delivery requests. Requires ActiveRecord 3.0.0 or higher.
-* Surety uses Resque to underpin the message processing/retry loop. Requires Resque 1.19.0 or higher.
 
 
 Usage / Examples
 ================
 
-A simple class that can send a message for guaranteed delivery:
+After installing, just type
 
-    class TestGenerator
-      include Surety::Generator
-    
-      def some_method
-        self.send_message(message_content)
-      end
-    end
+    rails generate deify:install
     
 
-On the server side, to start up the loop to process messages:
+This will create three files in your Rails app: config/redis.yml, config/initializers/resque.rb, and config/god/resque.god.
 
-  Surety::Processor.request_next
+* Make sure to set the correct app name in resque.god and namespace in resque.rb.
+* The app name in resque.god MUST match the app name in deploy.rb in order for capistrano-git-plugins to work.
+* resque.rb can set any namespace that makes sense but they typically defaults to "resque:#{app_name}" and "resque:test_#{app_name}".
 
-    
-Configuration
-=============
-
-Both the prefix for the ActiveRecord database connection name (as specified in database.yml) and the class to which Surety delegates messages for processing after pulling them off the queue are configurable.
-
-Also configurable are three parameters related to failure retries: 
- * retry interval: base amount of time to wait before a retry, in minutes. Defaults to 10. 
- * backoff factor: factor to divide the failure count by before calculating an exponential backoff. The backoff factor is (2^floor(failure count/backoff interval)). Defaults to 2.
- * max backoff: maximum number of powers of 2 to backoff. Defaults to 7 (which gives a backoff factor of 128; together with the default retry interval of 10, this produces a default max backoff amount of 1280 minutes ~ 1 day).
-
-Example configuration (from a sample config/initializers/surety.rb file)
-
-Surety::Configuration.database_prefix = 'surety_'
-Surety::Configuration.message_processing_delegate = MessageDistributor
-Surety::Configuration.retry_interval = 20
-Surety::Configuration.backoff_factor = 4
-Surety::Configuration.max_backoff = 5
-
-
-Install
-=======
-
-### As a gem
-
-    $ gem install surety
 
 
 Acknowledgements
 ================
 
 Copyright (c) 2012 Monica McArthur, released under the MIT license.
-
-Thanks to Ryan and Steve for arguing that this gem was necessary... it is.
